@@ -1,0 +1,13 @@
+import math
+output.ShallowCopy(inputs[0].VTKObject)  # Include this if you haven't 
+nu0 = vtk.vtkFloatArray()
+nu0.SetName('ViscDiff')
+nu0.SetNumberOfComponents(1)
+numPoints = output.GetNumberOfPoints()
+myArr0 = inputs[0].GetPointData().GetArray('Viscosity [Pa s]')
+myArr1 = inputs[1].GetPointData().GetArray('Viscosity [Pa s]')
+for i in range(0,numPoints):
+  s = abs(myArr0.GetValue(i)-myArr1.GetValue(i))
+  nu0.InsertNextValue(s)
+
+output.GetPointData().AddArray(nu0)
