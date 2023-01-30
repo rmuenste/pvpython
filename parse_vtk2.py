@@ -22,7 +22,7 @@ def parseVtu(fileName):
 #            print(bla.attrib['Name'])
             if bla.attrib['Name'] == 'Pressure_V':
                 pressV = bla.text.split()
-                print(len(pressV))
+#                print(len(pressV))
                 #del pressV[::5]
                 pressV = pressV[::5]
             if bla.attrib['Name'] == 'Velocity':
@@ -49,15 +49,17 @@ to a "piece" file in the format
 def main():
     inputName = sys.argv[1]
     file, ext = os.path.splitext(inputName)
+    fileBase = os.path.basename(file)
     outDir = sys.argv[2]
-    outputName = "./%s/piece_%s.dat" %(outDir, file[14:])
-    print(inputName)
-    print(outputName)
+    outputName = "%s/piece_%s.dat" %(outDir, fileBase[9:])
+    print("Processing: %s" %(os.path.basename(outputName)))
+#    print("sys argv: ",inputName)
+#    print("out name: ",outputName)
+
     (v, p) = parseVtu(inputName)
     writeParsed(v, p, outputName)
-    print(type(p))
-    print(len(p))
-    print(len(v))
+#    print(len(p))
+#    print(len(v))
 
 if __name__ == "__main__":
     main()
