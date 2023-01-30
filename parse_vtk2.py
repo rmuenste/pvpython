@@ -37,11 +37,20 @@ def writeParsed(vel, press, fileName):
     with open(fileName, "w") as f:
         for idx, item in enumerate(press):
             f.write("%s %s %s %s\n" %(press[idx], vel[idx][0], vel[idx][1], vel[idx][2]))
-
+'''
+This script parses a .vtu file and extracts the velocity and pressure and then writes these
+to a "piece" file in the format
+0 velocity_x velocity_y velocity_z pressure
+1 velocity_x velocity_y velocity_z pressure
+2 velocity_x velocity_y velocity_z pressure
+3 velocity_x velocity_y velocity_z pressure
+...
+'''
 def main():
     inputName = sys.argv[1]
     file, ext = os.path.splitext(inputName)
-    outputName = "./sampleData2/piece_%s.dat" %(file[14:])
+    outDir = sys.argv[2]
+    outputName = "./%s/piece_%s.dat" %(outDir, file[14:])
     print(inputName)
     print(outputName)
     (v, p) = parseVtu(inputName)
