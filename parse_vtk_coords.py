@@ -17,12 +17,7 @@ import re
 import sys
 import argparse
 import xml.etree.ElementTree as ET
-#for i in piece_???.00000.dat; do cat $i >> all_00000.data; done
-#for((i=0;i<=10000;i=i+50)); do for((j=1;j<=48;j++)); do name=$(printf "res_node_%03d.%05d.vtu" $j $i); echo $name; done; done
-#for((i=0;i<=1000;i=i+50)); do for((j=1;j<=48;j++)); do name=$(printf "res_node_%03d.%05d.vtu" $j $i); python3 ./parse_vtk.py "_vtk/$name"; done; done
-#1000
-#for((i=0;i<=1000;i=i+50)); do for((j=1;j<=48;j++)); do name1=$(printf "piece_%03d.%05d.dat" $j $i); name2=$(printf "step_%05d.res" $i); echo $name1; cat $name1 >> $name2; done; done
-#_vtk/res_node_000.
+
 def parseVtu(fileName):
     """
     Parse the vtu file into an etree structure
@@ -33,31 +28,25 @@ def parseVtu(fileName):
     elems = [elem.tag for elem in root.iter()]
     #print(elems)
 
-    pressV = ""
-    vel = ""
+    coords = ""
     for bla in root.iter():
         if bla.tag =="DataArray":
 #            print(bla.attrib['Name'])
-            if bla.attrib['Name'] == 'Pressure_V':
-                pressV = bla.text.split()
-#                print(len(pressV))
-                #del pressV[::5]
-                pressV = pressV[::5]
-            if bla.attrib['Name'] == 'Velocity':
-                vel = bla.text.split()
-                vel = list(zip(vel[::3], vel[1::3], vel[2::3]))
+            if bla.attrib['Name'] == 'Points':
+                coords = bla.text.split()
+                coords = list(zip(coords[::3], coords[1::3], coords[2::3]))
                 #del vel[::5]
-                vel = vel[::5]
+                coords = coords[::5]
 
-    return vel, pressV
+    return coords
 
-def writeParsed(vel, press, fileName):
+def writeParsed(coords, fileName):
     """
-    Writes the velocity and pressure arrays into a file
+    Writes the coordinates array into a file
     """
     with open(fileName, "w") as f:
-        for idx, item in enumerate(press):
-            f.write("%s %s %s %s\n" %(press[idx], vel[idx][0], vel[idx][1], vel[idx][2]))
+        for idx, item in enumerate(coords):
+            f.write("%s %s %s\n" %(coords[idx][0], coords[idx][1], coords[idx][2]))
 
 def main():
     # Set up the argument parser
@@ -70,14 +59,14 @@ def main():
     file, ext = os.path.splitext(inputName)
     fileBase = os.path.basename(file)
     outDir = args.outputDir 
-    outputName = "%s/piece_%s.dat" %(outDir, fileBase[9:])
+    outputName = "%s/c_piece_%s.dat" %(outDir, fileBase[9:])
 
     print("Processing: %s" %(os.path.basename(outputName)))
 #    print("sys argv: ",inputName)
 #    print("out name: ",outputName)
 
-    (v, p) = parseVtu(inputName)
-    writeParsed(v, p, outputName)
+    coords = parseVtu(inputName)
+    writeParsed(coords, outputName)
 
 if __name__ == "__main__":
     main()
