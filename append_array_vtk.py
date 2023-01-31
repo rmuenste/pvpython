@@ -24,7 +24,7 @@ def parseVtu(fileName, arrayName):
 
     values = ""
     for i in uavg:
-        i = i / 10001
+        i = i 
         values = values + f"{i[0]} {i[1]} {i[2]}\n"
 
     elems = [elem.tag for elem in root.iter()]

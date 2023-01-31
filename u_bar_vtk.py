@@ -168,7 +168,7 @@ def main():
 
     if args.filePattern:
         res = glob.glob(args.filePattern)
-        print(res)
+        #print(res)
         #print(os.getcwd())
     
     if args.procs:
@@ -178,7 +178,7 @@ def main():
             procsStart = int(valProcs[0])
             procsEnd   = int(valProcs[1])
 
-    print("%d %d" %(procsStart, procsEnd))
+    print("%d %d %d" %(procsStart, procsEnd, len(res)))
 
     processListProcs(res, procsStart, procsEnd)
 
@@ -191,7 +191,6 @@ def main():
 #    else:
 #        print("here")
 #        #processFileList(sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]))
-    sys.exit(-2)
 #    print(res[0])
 #    for j in range(1, 2):
 #        inputName = res[0]
