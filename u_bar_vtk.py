@@ -11,6 +11,7 @@ import xml.etree.ElementTree as ET
 
 #~/anaconda3/python.exe u_avg_vtk.py files.dat 2 1 27
 #for i in {1..27}; do ~/anaconda3/python.exe partial_sums.py $i 3; done
+#python pvpython/u_bar_vtk.py -f "D:\\work\\avg\\sampleVtk\\main.*.pvtu" -p 1-27
 
 def parseVtu(fileName):
     tree = ET.parse(fileName)
