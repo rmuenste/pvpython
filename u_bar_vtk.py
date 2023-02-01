@@ -103,6 +103,14 @@ def calcSize(files, idx):
         u_bar = parseVtu(name)
         return u_bar.shape
 
+def generateNames(files, idxStart, idxEnd):
+
+    fileNumbers = extractFileNumber(files)
+    partId = "%s-%s" %(fileNumbers[0],fileNumbers[len(files)-1])
+    for pidx in range(idxStart, idxEnd+1):
+        name = "u_avg_%03d_part_%s.txt" %(pidx, partId)
+        print(name)
+
 def processListProcs(files, idxStart, idxEnd):
 
     fileNumbers = extractFileNumber(files)
@@ -159,6 +167,7 @@ def main():
     # Set up the argument parser
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--filePattern", help="Pattern for the file series to process. Has to be put into \"\" on Bash, etc... to stop expansion.")
+    parser.add_argument("-l", "--fileList", help="A file with the file series to process.")
     parser.add_argument("-p", "--procs", help="Here we specify which processor output to process: 1 -> processor 1 OR 3-5 processors 3 to 5")
     args = parser.parse_args()
 
@@ -169,8 +178,13 @@ def main():
     if args.filePattern:
         res = glob.glob(args.filePattern)
         res.sort()
-        print(res)
         #print(os.getcwd())
+
+    if args.fileList:
+        with open(args.fileList, "r") as fileList:
+            res = fileList.readlines()
+            res.sort()
+            #print(os.getcwd())
     
     if args.procs:
         valProcs = args.procs.split("-")
@@ -180,6 +194,10 @@ def main():
             procsEnd   = int(valProcs[1])
 
     print("%d %d %d" %(procsStart, procsEnd, len(res)))
+
+    # Debug routint
+    #=================================================
+    #generateNames(res, procsStart, procsEnd)
 
     processListProcs(res, procsStart, procsEnd)
 
