@@ -1,20 +1,20 @@
+"""
+This script appends a data array from a file to a set of .vtu files
+
+Example launch command from a bash console
+#//========================================
+#for((i=2;i<=27;i++)); do name=$(printf "res_node_%03d.00000.vtu" $i); name2=$(printf "u_avg_%03d_part_0-10000.txt" $i); ~/anaconda3/python.exe append_array_vtk.py $name $name2; done
+"""
 import os
 import re
 import sys
 import glob
 import copy
+import argparse
 import numpy as np
 import xml.etree.ElementTree as ET
-#for i in piece_???.00000.dat; do cat $i >> all_00000.data; done
-#for((i=0;i<=10000;i=i+50)); do for((j=1;j<=48;j++)); do name=$(printf "res_node_%03d.%05d.vtu" $j $i); echo $name; done; done
-#for((i=0;i<=1000;i=i+50)); do for((j=1;j<=48;j++)); do name=$(printf "res_node_%03d.%05d.vtu" $j $i); python3 ./parse_vtk.py "_vtk/$name"; done; done
-#1000
-#for((i=0;i<=1000;i=i+50)); do for((j=1;j<=48;j++)); do name1=$(printf "piece_%03d.%05d.dat" $j $i); name2=$(printf "step_%05d.res" $i); echo $name1; cat $name1 >> $name2; done; done
-#_vtk/res_node_000.
-#~/anaconda3/python.exe u_avg_vtk.py files.dat 2 1 27
-#for i in {1..27}; do ~/anaconda3/python.exe partial_sums.py $i 3; done
-#for((i=2;i<=27;i++)); do name=$(printf "res_node_%03d.00000.vtu" $i); name2=$(printf "u_avg_%03d_part_0-10000.txt" $i); ~/anaconda3/python.exe append_array_vtk.py $name $name2; done
-def parseVtu(fileName, arrayName):
+
+def parseVtu(fileName, arrayName, outDir):
     tree = ET.parse(fileName)
     root = tree.getroot()
 
@@ -48,7 +48,7 @@ def parseVtu(fileName, arrayName):
             #print(nodeList)
             #vel.text = "\n".join(nodeList)
         
-    tree.write("sampleDir/%s" %fileName)
+    tree.write("%s/%s" %(outDir, fileName))
 
 def writeParsed(vel, press, fileName):
     with open(fileName, "w") as f:
@@ -56,12 +56,15 @@ def writeParsed(vel, press, fileName):
             f.write("%s %s %s %s\n" %(press[idx], vel[idx][0], vel[idx][1], vel[idx][2]))
 
 def main():
-    # args: offset step 
-    if len(sys.argv) > 1:
-        print(sys.argv)
-        fileName = sys.argv[1]
-        arrayName = sys.argv[2]
-        parseVtu(fileName, arrayName)
+    # Set up argument parser
+    parser = argparse.ArgumentParser()
+    parser.add_argument("fileName", help="Name of the target .vtu file")
+    parser.add_argument("arrayName", help="Name of the file that contains the data set to be appended")
+    parser.add_argument("-d", "--outdir", help="Name of the output directory", nargs='?', const=1, type=str, default="sampleDir")
+    args = parser.parse_args()
+
+    print(args)
+    parseVtu(args.fileName, args.arrayName, args.outdir)
 
 if __name__ == "__main__":
     main()
