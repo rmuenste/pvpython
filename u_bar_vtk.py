@@ -168,7 +168,8 @@ def main():
 
     if args.filePattern:
         res = glob.glob(args.filePattern)
-        #print(res)
+        res.sort()
+        print(res)
         #print(os.getcwd())
     
     if args.procs:
