@@ -1,3 +1,9 @@
+"""
+Iterate through a file series and compute the effective viscosity
+
+Example launch command:
+pvbatch pvpython/mu_eff.py fileList.txt -s 0 -e 3
+"""
 #### import the simple module from the paraview
 from paraview.simple import *
 import os 
@@ -25,18 +31,20 @@ def natcasecmp(a, b):
 
 def main():
 
-    files = glob.glob("main.*.pvtu")
-    files.sort()
-
-    print(files)
-
     startTime = 0
     endTime = 0
     parser = argparse.ArgumentParser()
-    parser.add_argument("-o", "--output", help="Name of the output file")
-    parser.add_argument("-s", "--startTime", help="Start of the animation")
-    parser.add_argument("-e", "--endTime", help="End of the animation")
+    parser.add_argument("fileSeries", help="Path to the file series")
+    parser.add_argument("-o", "--output", nargs='?', const=1, default="u_eff.dat", type=str, help="Name of the output file")
+    parser.add_argument("-s", "--startTime", help="Start of the animation", type=float)
+    parser.add_argument("-e", "--endTime", help="End of the animation", type=float)
     args = parser.parse_args()
+
+    with open(args.fileSeries, "r") as f:
+      files = f.readlines()
+
+    files = [x.strip() for x in files]
+
     if args.output:
       fileName = args.output
 
@@ -47,6 +55,9 @@ def main():
 
     # get animation scene
     animationScene1 = GetAnimationScene()
+
+    # update animation scene based on data timesteps
+    animationScene1.UpdateAnimationUsingDataTimeSteps()
 
     if args.startTime:
       startTime = args.startTime
@@ -59,8 +70,17 @@ def main():
       endTime = animationScene1.EndTime
 
     print("StartTime: %s, EndTime: %s" %(startTime, endTime))
-    # update animation scene based on data timesteps
-    animationScene1.UpdateAnimationUsingDataTimeSteps()
+
+    startTime = args.startTime
+    #startTime = animationScene1.StartTime
+
+    animationScene1.StartTime = startTime
+    animationScene1.AnimationTime = startTime
+
+    endIdx = int(endTime)
+    startIdx = int(startTime)
+    frames = endIdx - startIdx
+    print("Number of steps=%d" %frames)
 
     # Properties modified on main000
     main000.TimeArray = 'None'
@@ -281,8 +301,7 @@ with open("{fileName}", "a") as f:
     # get animation scene
     animationScene1 = GetAnimationScene()
 
-    endTime = int(animationScene1.EndTime)
-    for i in range(endTime):
+    for i in range(frames):
         animationScene1.GoToNext()
 
 #    while animationScene1.AnimationTime <= animationScene1.EndTime:
@@ -293,7 +312,7 @@ with open("{fileName}", "a") as f:
     #animationScene1.Play()
     #for i in range(frames):
     #  t = float(i)
-    #  ans.AnimationTime=t
+    #  animationScene1.AnimationTime=t
     #  print("time: ", t)
 
 if __name__ == "__main__":
