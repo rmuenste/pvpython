@@ -137,28 +137,30 @@ def main():
   programmableFilter1_1 = ProgrammableFilter(registrationName='ProgrammableFilter1', Input=calculator9)
   
   # Properties modified on programmableFilter1_1
-  programmableFilter1_1.Script = """from paraview.vtk.numpy_interface import dataset_adapter as dsa
-  import numpy
-  def make_tensor(xx,yy,zz, xy, yz, xz):
-    t = numpy.vstack([xx,yy,zz,xy, yz, xz]).transpose().view(dsa.VTKArray)
-    t.DataSet = xx.DataSet
-    t.Association = xx.Association
-    return t
+  programmableFilter1_1.Script = """
+from paraview.vtk.numpy_interface import dataset_adapter as dsa
+import numpy
+def make_tensor(xx,yy,zz, xy, yz, xz):
+  t = numpy.vstack([xx,yy,zz,xy, yz, xz]).transpose().view(dsa.VTKArray)
+  t.DataSet = xx.DataSet
+  t.Association = xx.Association
+  return t
   
-  input0 = inputs[0]
-  
-  grads = input0.CellData["Gradients"]
-  xx = inputs[0].CellData["dudx"]
-  yy = inputs[0].CellData["dvdy"]
-  zz = inputs[0].CellData["dwdz"]
-  xy = (inputs[0].CellData["dudy"] + inputs[0].CellData["dvdx"]) * 0.5
-  yz = (inputs[0].CellData["dvdz"] + inputs[0].CellData["dwdy"]) * 0.5
-  xz = (inputs[0].CellData["dudz"] + inputs[0].CellData["dwdx"]) * 0.5
-  
-  DDProd = xx * xx + yy * yy + zz * zz + 2.0 * xy * xy + 2.0 * xz * xz + 2.0 * yz * yz 
-  # Add the new array to the output
-  output.CellData.append(make_tensor(xx,yy,zz,xy,yz,xz), "DefTensor")
-  output.CellData.append(DDProd, "DoubleDot")"""
+input0 = inputs[0]
+
+grads = input0.CellData["Gradients"]
+xx = inputs[0].CellData["dudx"]
+yy = inputs[0].CellData["dvdy"]
+zz = inputs[0].CellData["dwdz"]
+xy = (inputs[0].CellData["dudy"] + inputs[0].CellData["dvdx"]) * 0.5
+yz = (inputs[0].CellData["dvdz"] + inputs[0].CellData["dwdy"]) * 0.5
+xz = (inputs[0].CellData["dudz"] + inputs[0].CellData["dwdx"]) * 0.5
+
+DDProd = xx * xx + yy * yy + zz * zz + 2.0 * xy * xy + 2.0 * xz * xz + 2.0 * yz * yz 
+# Add the new array to the output
+output.CellData.append(make_tensor(xx,yy,zz,xy,yz,xz), "DefTensor")
+output.CellData.append(DDProd, "DoubleDot")
+"""
   
   programmableFilter1_1.RequestInformationScript = ''
   programmableFilter1_1.RequestUpdateExtentScript = ''
