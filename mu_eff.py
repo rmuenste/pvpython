@@ -255,7 +255,7 @@ output.CellData.append(DDProd, "DoubleDot")"""
     pythonCalculator1.ArrayAssociation = 'Cell Data'
 
     # Properties modified on pythonCalculator1
-    pythonCalculator1.Expression = 'sum(DoubleDot*vol)*0.1/0.56018'
+    pythonCalculator1.Expression = 'sum(DoubleDot*vol)*0.1/0.5703734377132359'
     pythonCalculator1.ArrayName = 'Ueff'
 
     UpdatePipeline(time=0.0, proxy=pythonCalculator1)
